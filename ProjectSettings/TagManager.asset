@@ -4,12 +4,12 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - CinemachineTarget
+  - Syringe
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Grabbable
   - Water
   - UI
   - Interactable
