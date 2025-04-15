@@ -21,11 +21,17 @@ public class PlayerHealth : MonoBehaviour
     public float fadeSpeed = 2f;
     private float durationTimer;
 
+    private bool isDead = false;
+
+    // Game Over panel
+    public GameObject gameOverPanel;
+
     void Start()
     {
         health = maxHealth;
         overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, 0);
         UpdateHealthUI();
+        gameOverPanel.SetActive(false); // Ensure the game over panel is inactive initially
     }
 
     void Update()
@@ -33,6 +39,12 @@ public class PlayerHealth : MonoBehaviour
         health = Mathf.Clamp(health, 0, maxHealth);
         UpdateHealthUI();
         HandleDamageOverlay();
+        
+        // Check if health falls below 20 and show the Game Over panel
+        if (health < 20f && !isDead)
+        {
+            ShowGameOver();
+        }
     }
 
     void HandleDamageOverlay()
@@ -78,10 +90,7 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        if (health == 10)
-        {
-            FindObjectOfType<GameOver>().ShowGameOver();
-        }
+        if (isDead) return;
 
         health -= damage;
         lerpTimer = 0f;
@@ -89,5 +98,26 @@ public class PlayerHealth : MonoBehaviour
         overlay.color = new Color(overlay.color.r, overlay.color.g, overlay.color.b, 1);
 
         UpdateHealthUI();
+
+        if (health <= 0)
+        {
+            isDead = true;
+            Die();
+        }
+    }
+
+    void ShowGameOver()
+    {
+        if (health < 20f && !gameOverPanel.activeSelf)
+        {
+            gameOverPanel.SetActive(true);  // Show Game Over panel when health is below 20
+        }
+    }
+
+    void Die()
+    {
+        FindObjectOfType<GameOver>()?.ShowGameOver(); // Null check
+        Debug.Log("Player mati!");
+        // Tambahkan animasi mati / disable control jika perlu
     }
 }

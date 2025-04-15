@@ -3,65 +3,64 @@ using UnityEngine.UI;
 
 public class PlayerEnergy : MonoBehaviour
 {
-    public Image barEnergy;
-    public float maxEnergy = 100f;
-    private float energiSekarang;
-    public float rateEnergyBerkurangi = 10f; // Energi berkurang per detik saat sprint
-    public float rateEnergyBertambah = 5f;   // Energi bertambah per detik saat tidak sprint
-    private PlayerMotor playerMotor; 
+    public Image barEnergy; // UI bar untuk menunjukkan energi pemain
+    public float maxEnergy = 100f; // Maksimum energi yang bisa dimiliki pemain
+    private float energiSekarang; // Nilai energi saat ini
+    public float rateEnergyBerkurangi = 10f; // Kecepatan pengurangan energi per detik saat sprint
+    public float rateEnergyBertambah = 5f;   // Kecepatan pemulihan energi saat tidak sprint
+    private PlayerMotor playerMotor; // Referensi ke skrip PlayerMotor untuk mengontrol pergerakan
 
     void Start()
     {
-        energiSekarang = maxEnergy;
+        energiSekarang = maxEnergy; // Set energi awal ke maksimum
         playerMotor = GetComponent<PlayerMotor>(); // Ambil referensi ke PlayerMotor
-        UpdateBar();
+        UpdateBar(); // Perbarui tampilan UI bar energi
     }
 
     void Update()
     {
-        if (playerMotor != null && playerMotor.IsSprinting())
+        if (playerMotor != null && playerMotor.IsSprinting()) // Jika pemain sedang sprint
         {
-            KurangiEnergi(rateEnergyBerkurangi * Time.deltaTime);
+            KurangiEnergi(rateEnergyBerkurangi * Time.deltaTime); // Kurangi energi
         }
-        else
+        else // Jika pemain tidak sprint
         {
-            TambahEnergi(rateEnergyBertambah * Time.deltaTime);
+            TambahEnergi(rateEnergyBertambah * Time.deltaTime); // Pulihkan energi
         }
 
-        if (energiSekarang <= 0)
+        if (energiSekarang <= 0) // Jika energi habis
         {
-            playerMotor.ForceWalk(); // Paksa pemain berjalan saat energi habis
+            playerMotor.ForceWalk(); // Paksa pemain berjalan (tidak bisa sprint)
         }
     }
 
     void UpdateBar()
     {
-        barEnergy.fillAmount = energiSekarang / maxEnergy;
+        barEnergy.fillAmount = energiSekarang / maxEnergy; // Perbarui tampilan bar energi
     }
 
     public void KurangiEnergi(float amount)
     {
-        energiSekarang -= amount;
-        if (energiSekarang < 0)
+        energiSekarang -= amount; // Kurangi energi sebesar amount
+        if (energiSekarang < 0) // Jika energi kurang dari 0, set menjadi 0
         {
             energiSekarang = 0;
         }
-        UpdateBar();
+        UpdateBar(); // Perbarui tampilan bar energi
     }
 
     public void TambahEnergi(float amount)
     {
-        energiSekarang += amount;
-        if (energiSekarang > maxEnergy)
+        energiSekarang += amount; // Tambah energi sebesar amount
+        if (energiSekarang > maxEnergy) // Jika energi melebihi maksimum, set ke maksimum
         {
             energiSekarang = maxEnergy;
         }
-        UpdateBar();
+        UpdateBar(); // Perbarui tampilan bar energi
     }
 
     public float GetCurrentEnergy()
-{
-    return energiSekarang;
-}
-
+    {
+        return energiSekarang; // Mengembalikan nilai energi saat ini
+    }
 }

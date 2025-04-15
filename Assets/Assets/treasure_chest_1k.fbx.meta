@@ -3,7 +3,12 @@ guid: 14d794df590dc3845ba97d554476225f
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: treasure_chest
+    second: {fileID: 2100000, guid: e69b5bf33715fab42a66fa4f80704757, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

@@ -3,73 +3,120 @@ using UnityEngine.UI;
 
 public class PlayerGrab : MonoBehaviour
 {
-    public Transform holdPosition; // Posisi di mana objek dipegang
-    public LayerMask grabbableLayer; // Layer untuk objek yang bisa diambil
-    public float grabRange = 2f; // Jarak interaksi
-    public float placeRange = 2f; // Jarak untuk meletakkan vaksin
-    public float exitRange = 3f; // Jarak untuk keluar dari basement
-    public GameObject promptMessage; // UI Prompt Message
-    public GameObject missionSuccessPanel; // Panel mission success
-    public Text distanceText; // UI teks untuk menampilkan jarak ke tempat letakkan vaksin
-    public Transform targetMarker; // Target lokasi untuk meletakkan vaksin
-    public GameObject placePrompt; // UI untuk "Press E untuk menyimpan vaksin"
-    public Transform outOfBasement; // Titik keluar dari basement
-    public Text exitDistanceText; // UI teks jarak ke titik keluar
+    // Posisi objek dipegang oleh pemain
+    public Transform holdPosition; 
 
-    private GameObject grabbedObject;
-    private bool isHolding = false;
-    private bool vaccinePlaced = false; // Menyimpan status apakah vaksin sudah diletakkan
+    // Layer objek yang bisa diambil
+    public LayerMask grabbableLayer; 
+
+    // Jarak maksimum untuk mengambil objek
+    public float grabRange = 2f; 
+    
+    // Jarak maksimum untuk meletakkan vaksin
+    public float placeRange = 2f; 
+    
+    // Jarak maksimum untuk keluar dari basement
+    public float exitRange = 3f; 
+
+    // UI untuk menampilkan pesan interaksi
+    public GameObject promptMessage; 
+    
+    // Panel yang muncul jika misi sukses
+    public GameObject missionSuccessPanel; 
+
+    // UI teks untuk menampilkan jarak ke lokasi vaksin
+    public Text distanceText; 
+    
+    // Penanda lokasi tempat meletakkan vaksin
+    public Transform targetMarker; 
+    
+    // UI untuk "Press E untuk menyimpan vaksin"
+    public GameObject placePrompt; 
+    
+    // Titik keluar dari basement
+    public Transform outOfBasement; 
+    
+    // UI teks jarak ke titik keluar
+    public Text exitDistanceText; 
+
+    // Objek yang sedang dipegang pemain
+    private GameObject grabbedObject; 
+    
+    // Status apakah pemain sedang memegang objek
+    private bool isHolding = false; 
+    
+    // Status apakah vaksin sudah diletakkan
+    private bool vaccinePlaced = false; 
 
     void Start()
     {
+        // Menyembunyikan UI pada awal permainan
         promptMessage.SetActive(false);
         missionSuccessPanel.SetActive(false);
         distanceText.gameObject.SetActive(false);
         placePrompt.SetActive(false);
-        exitDistanceText.gameObject.SetActive(false); // Sembunyikan jarak keluar sampai vaksin diletakkan
+        exitDistanceText.gameObject.SetActive(false);
     }
 
     void Update()
     {
+        // Mengecek apakah ada objek yang bisa diambil
         CheckForGrabbableObject();
 
+        // Jika pemain menekan tombol "E"
         if (Input.GetKeyDown(KeyCode.E))
         {
             if (isHolding)
             {
+                // Jika sedang memegang objek, coba letakkan
                 TryPlaceObject();
             }
             else
             {
+                // Jika tidak memegang objek, coba ambil objek
                 GrabObject();
             }
         }
 
+        // Jika pemain sedang memegang objek, tampilkan jarak ke lokasi target
         if (isHolding)
         {
             UpdateDistanceToTarget();
         }
 
+        // Jika vaksin sudah diletakkan, tampilkan jarak ke pintu keluar
         if (vaccinePlaced)
         {
             UpdateDistanceToExit();
         }
     }
 
+    // Memastikan objek selalu berada di posisi tangan saat dipegang
+    void LateUpdate()
+    {
+        if (isHolding && grabbedObject != null)
+        {
+            grabbedObject.transform.position = holdPosition.position;
+            grabbedObject.transform.rotation = holdPosition.rotation;
+        }
+    }
+
+    // Mengecek apakah ada objek yang bisa diambil dalam radius grabRange
     void CheckForGrabbableObject()
     {
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, grabRange, grabbableLayer);
 
         if (hitColliders.Length > 0 && grabbedObject == null)
         {
-            promptMessage.SetActive(true);
+            promptMessage.SetActive(true); // Tampilkan UI "Press E"
         }
         else
         {
-            promptMessage.SetActive(false);
+            promptMessage.SetActive(false); // Sembunyikan UI jika tidak ada objek
         }
     }
 
+    // Mengambil objek dalam jangkauan
     void GrabObject()
     {
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, grabRange, grabbableLayer);
@@ -77,45 +124,57 @@ public class PlayerGrab : MonoBehaviour
         if (hitColliders.Length > 0)
         {
             grabbedObject = hitColliders[0].gameObject;
-            grabbedObject.transform.position = holdPosition.position;
-            grabbedObject.transform.parent = holdPosition;
-            grabbedObject.GetComponent<Rigidbody>().isKinematic = true;
             isHolding = true;
-            promptMessage.SetActive(false);
 
-            // Ubah teks menjadi "Letakkan vaksin" dan tampilkan jarak ke targetMarker
+            // Menonaktifkan physics agar objek tidak jatuh
+            grabbedObject.GetComponent<Rigidbody>().isKinematic = true; 
+
+            // Menjadikan objek sebagai anak dari holdPosition
+            grabbedObject.transform.SetParent(holdPosition); 
+
+            // Menyembunyikan UI prompt dan menampilkan jarak ke target
+            promptMessage.SetActive(false);
             distanceText.gameObject.SetActive(true);
             distanceText.text = "Letakkan vaksin";
         }
     }
 
+    // Mengecek apakah pemain bisa meletakkan objek
     void TryPlaceObject()
     {
         float distance = Vector3.Distance(transform.position, targetMarker.position);
 
-        if (distance <= placeRange) // Jika dalam jarak yang bisa meletakkan vaksin
+        if (distance <= placeRange) // Jika dalam jarak placeRange
         {
-            PlaceObject();
+            PlaceObject(); // Panggil fungsi meletakkan vaksin
         }
     }
 
+    // Meletakkan vaksin di lokasi target
     void PlaceObject()
     {
-        grabbedObject.transform.parent = null;
-        grabbedObject.GetComponent<Rigidbody>().isKinematic = false;
+        // Melepaskan objek dari tangan
+        grabbedObject.transform.SetParent(null); 
+
+        // Mengaktifkan physics kembali agar objek tidak diam di udara
+        grabbedObject.GetComponent<Rigidbody>().isKinematic = false; 
+
+        // Mengupdate status
         isHolding = false;
-        vaccinePlaced = true; // Tandai bahwa vaksin telah diletakkan
+        vaccinePlaced = true;
 
-        // Sembunyikan teks jarak setelah vaksin diletakkan
+        // Menyembunyikan UI yang tidak diperlukan
         distanceText.gameObject.SetActive(false);
-        placePrompt.SetActive(false); // Sembunyikan prompt "Press E"
+        placePrompt.SetActive(false);
+        
+        // Menyembunyikan target marker setelah vaksin diletakkan
+        targetMarker.gameObject.SetActive(false);
 
-        // Langsung tampilkan teks jarak keluar basement
+        // Menampilkan UI jarak ke pintu keluar basement
         exitDistanceText.gameObject.SetActive(true);
-
-        // Tampilkan panel mission success (jika ada kondisi tambahan bisa ditambahkan di sini)
     }
 
+    // Menampilkan jarak ke lokasi target vaksin
     void UpdateDistanceToTarget()
     {
         float distance = Vector3.Distance(transform.position, targetMarker.position);
@@ -123,16 +182,17 @@ public class PlayerGrab : MonoBehaviour
 
         if (distance <= placeRange)
         {
-            distanceText.color = Color.green;
-            placePrompt.SetActive(true);
+            distanceText.color = Color.green; // Warna hijau jika dekat target
+            placePrompt.SetActive(true); // Tampilkan UI "Press E"
         }
         else
         {
-            distanceText.color = Color.white;
-            placePrompt.SetActive(false);
+            distanceText.color = Color.white; // Warna normal
+            placePrompt.SetActive(false); // Sembunyikan UI
         }
     }
 
+    // Menampilkan jarak ke pintu keluar basement
     void UpdateDistanceToExit()
     {
         float exitDistance = Vector3.Distance(transform.position, outOfBasement.position);
@@ -140,9 +200,12 @@ public class PlayerGrab : MonoBehaviour
 
         if (exitDistance <= exitRange)
         {
-            // Jika dalam jarak yang cukup dekat, langsung tampilkan panel Mission Success
+            // Jika dalam jarak cukup dekat, tampilkan panel Mission Success
             missionSuccessPanel.SetActive(true);
-            exitDistanceText.gameObject.SetActive(false); // Sembunyikan teks jarak karena sudah keluar
+            exitDistanceText.gameObject.SetActive(false); // Sembunyikan teks jarak
+
+            Cursor.lockState = CursorLockMode.None; // Bebaskan kursor
+            Cursor.visible = true; // Tampilkan kursor
         }
     }
 }
