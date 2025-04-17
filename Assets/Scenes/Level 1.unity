@@ -749,8 +749,8 @@ RectTransform:
   m_GameObject: {fileID: 86158144}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1570425157}
   m_Father: {fileID: 1545160047}
@@ -10458,8 +10458,8 @@ RectTransform:
   m_GameObject: {fileID: 1193979475}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 762831719}
   m_Father: {fileID: 1545160047}
@@ -11973,7 +11973,6 @@ MonoBehaviour:
   PlayerMove: {fileID: 2823432620843136490}
   PlayerLook: {fileID: 0}
   typingSpeed: -0.95
-  playerAttack: {fileID: 0}
   bossMutant: {fileID: 0}
   pauseMenu: {fileID: 1981239717}
 --- !u!114 &1338045543
@@ -14412,7 +14411,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1338045540}
         m_TargetAssemblyTypeName: GameOver, Assembly-CSharp
-        m_MethodName: HomeMenu
+        m_MethodName: QuitGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -17765,7 +17764,7 @@ PrefabInstance:
       objectReference: {fileID: 3683556972201295852}
     - target: {fileID: 3609733942541384737, guid: 14f69796e1561d549af36d98b4cb209f, type: 3}
       propertyPath: chaseRange
-      value: 20
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 3609733942541384737, guid: 14f69796e1561d549af36d98b4cb209f, type: 3}
       propertyPath: attackRange
@@ -18679,7 +18678,8 @@ PrefabInstance:
       propertyPath: MinDistance
       value: 3.2247496
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1907593603848270310, guid: 14f69796e1561d549af36d98b4cb209f, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -18764,9 +18764,17 @@ PrefabInstance:
       value: KeypadQuest
       objectReference: {fileID: 0}
     - target: {fileID: 3025836478694520922, guid: 8bf488a4abcae3c4fa7a4061e3b5d2eb, type: 3}
+      propertyPath: soal
+      value: Nama Virus yang menyebabkan Flu
+      objectReference: {fileID: 0}
+    - target: {fileID: 3025836478694520922, guid: 8bf488a4abcae3c4fa7a4061e3b5d2eb, type: 3}
       propertyPath: player
       value: 
       objectReference: {fileID: 2823432620843136490}
+    - target: {fileID: 3025836478694520922, guid: 8bf488a4abcae3c4fa7a4061e3b5d2eb, type: 3}
+      propertyPath: jawaban
+      value: Virus Influenza
+      objectReference: {fileID: 0}
     - target: {fileID: 3025836478694520922, guid: 8bf488a4abcae3c4fa7a4061e3b5d2eb, type: 3}
       propertyPath: teksSoal
       value: 
@@ -20441,7 +20449,8 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: -0.079721585
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 504875002084088532, guid: 68e5ef2ec62812e429cb592529282c09, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

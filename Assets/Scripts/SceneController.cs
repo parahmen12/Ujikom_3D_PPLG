@@ -142,6 +142,10 @@ public void BackGame()
     {
         SceneManager.LoadScene("Home");
     }
+    public void LevelPrologue()
+    {
+        SceneManager.LoadScene("Materi");
+    }
 
     public void Level1()
     {

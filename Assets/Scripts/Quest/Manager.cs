@@ -5,96 +5,97 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     [Header("Intro & UI")]
-    public string[] textIntro;
-    public Text textUI;
-    private int index = 0;
-    public GameObject panelMisi;
+    public string[] textIntro;  // Array berisi teks intro yang akan ditampilkan pada UI
+    public Text textUI;  // Referensi ke komponen Text untuk menampilkan teks intro
+    private int index = 0;  // Indeks untuk melacak teks intro yang sedang ditampilkan
+    public GameObject panelMisi;  // Panel misi yang menampilkan teks intro
 
     [Header("Player & Controls")]
-    public GameObject ScoreText;
-    public GameObject PlayerMove;
-    public GameObject PlayerLook;
-    public float typingSpeed = 0.02f;
-    private Coroutine typingCoroutine;
-
-    [Header("Player Attack")]
-    public GameObject playerAttack;
-    public BossMutant bossMutant; // ← Drag BossMutant di Inspector
+    public GameObject ScoreText;  // Referensi ke objek yang menampilkan skor
+    public GameObject PlayerMove;  // Referensi ke objek yang mengendalikan pergerakan pemain
+    public GameObject PlayerLook;  // Referensi ke objek yang mengendalikan pandangan pemain
+    public float typingSpeed = 0.02f;  // Kecepatan pengetikan untuk teks intro
+    private Coroutine typingCoroutine;  // Menyimpan referensi ke coroutine untuk pengetikan teks
 
     [Header("Pause Menu")]
-    public GameObject pauseMenu;
+    public GameObject pauseMenu;  // Referensi ke menu pause
 
     void Start()
     {
+        // Menonaktifkan tampilan skor pada awal permainan
         if (ScoreText != null) ScoreText.SetActive(false);
 
         // Nonaktifkan kontrol player saat panel misi aktif
         if (PlayerMove != null)
         {
-            var motor = PlayerMove.GetComponent<PlayerMotor>();
-            var look = PlayerMove.GetComponent<PlayerLook>();
-            var energy = PlayerMove.GetComponent<PlayerEnergy>();
+            var motor = PlayerMove.GetComponent<PlayerMotor>();  // Mendapatkan komponen PlayerMotor
+            var look = PlayerMove.GetComponent<PlayerLook>();  // Mendapatkan komponen PlayerLook
+            var energy = PlayerMove.GetComponent<PlayerEnergy>();  // Mendapatkan komponen PlayerEnergy
 
+            // Menonaktifkan komponen-komponen kontrol player
             if (motor != null) motor.enabled = false;
             if (look != null) look.enabled = false;
             if (energy != null) energy.enabled = false;
         }
 
-        // Nonaktifkan player attack
-        if (playerAttack != null)
-        {
-            var attack = playerAttack.GetComponent<PlayerAttack>();
-            if (attack != null) attack.enabled = false;
-        }
-
+        // Menampilkan panel misi dan memulai pengetikan teks intro
         panelMisi.SetActive(true);
         typingCoroutine = StartCoroutine(TypeText(textIntro[index]));
 
+        // Mengatur kursor agar tidak terkunci dan terlihat
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
 
     void Update()
     {
+        // Jika panel misi aktif, tunggu input Enter untuk melanjutkan atau hentikan pengetikan
         if (panelMisi.activeSelf)
         {
-            if (Input.GetKeyDown(KeyCode.Return))
+            if (Input.GetKeyDown(KeyCode.Return))  // Jika tombol Enter ditekan
             {
+                // Jika ada coroutine pengetikan yang berjalan, hentikan
                 if (typingCoroutine != null)
                 {
                     StopCoroutine(typingCoroutine);
-                    textUI.text = textIntro[index];
+                    textUI.text = textIntro[index];  // Tampilkan teks lengkap tanpa pengetikan
                     typingCoroutine = null;
                 }
                 else
                 {
+                    // Lanjutkan ke teks berikutnya
                     NextText();
                 }
             }
             return;
         }
 
+        // Jika tombol P ditekan, tampilkan menu pause
         if (Input.GetKeyDown(KeyCode.P) && pauseMenu != null)
         {
-            pauseMenu.GetComponent<PauseMenu>().PauseGame();
+            pauseMenu.GetComponent<PauseMenu>().PauseGame();  // Panggil fungsi untuk pause game
         }
     }
 
     public void NextText()
     {
+        // Jika ada coroutine pengetikan, hentikan
         if (typingCoroutine != null) StopCoroutine(typingCoroutine);
 
-        index++;
+        index++;  // Pindah ke teks intro berikutnya
+
+        // Jika masih ada teks berikutnya, mulai pengetikan teks
         if (index < textIntro.Length)
         {
             typingCoroutine = StartCoroutine(TypeText(textIntro[index]));
         }
         else
         {
+            // Jika sudah selesai dengan semua teks intro, aktifkan tampilan skor dan nonaktifkan panel misi
             if (ScoreText != null) ScoreText.SetActive(true);
             panelMisi.SetActive(false);
 
-            // Aktifkan kontrol player
+            // Aktifkan kembali kontrol player
             if (PlayerMove != null)
             {
                 var motor = PlayerMove.GetComponent<PlayerMotor>();
@@ -106,36 +107,20 @@ public class GameManager : MonoBehaviour
                 if (energy != null) energy.enabled = true;
             }
 
-            // Aktifkan player attack
-            if (playerAttack != null)
-            {
-                var attack = playerAttack.GetComponent<PlayerAttack>();
-                if (attack != null)
-                {
-                    attack.enabled = true;
-                    Debug.Log("PlayerAttack berhasil diaktifkan");
-                }
-            }
-
-            // Aktifkan boss
-            if (bossMutant != null)
-            {
-                bossMutant.ActivateBoss();
-            }
-
-            // Kunci cursor ke tengah & sembunyikan
+            // Kunci kursor di tengah layar dan sembunyikan
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
     }
 
+    // Fungsi untuk mengetikkan teks satu karakter pada satu waktu
     IEnumerator TypeText(string text)
     {
-        textUI.text = "";
-        foreach (char letter in text.ToCharArray())
+        textUI.text = "";  // Mulai dengan teks kosong
+        foreach (char letter in text.ToCharArray())  // Iterasi setiap karakter dalam teks
         {
-            textUI.text += letter;
-            yield return new WaitForSecondsRealtime(typingSpeed);
+            textUI.text += letter;  // Tambahkan karakter satu per satu
+            yield return new WaitForSecondsRealtime(typingSpeed);  // Tunggu beberapa detik antara karakter
         }
     }
 }

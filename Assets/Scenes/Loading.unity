@@ -348,7 +348,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: ABOUT
+  m_text: TIPS
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0161d805a3764c089bef00bfe00793f5, type: 2}
   m_sharedMaterial: {fileID: 2147374, guid: 0161d805a3764c089bef00bfe00793f5, type: 2}
@@ -567,7 +567,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   loadingBar: {fileID: 1420694607}
   loadingText: {fileID: 1321054268}
-  fakeLoadingSpeed: 0.5
+  fakeLoadingSpeed: 0.9
 --- !u!4 &419299474
 Transform:
   m_ObjectHideFlags: 0
@@ -861,15 +861,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Dalam kegelapan laboratorium bawah tanah, seorang dokter berjuang melawan
-    waktu dan teror yang mengintai di setiap sudut. Suara gemuruh langkah-langkah
-    asing menggema di lorong sempit, dindingnya berlumuran sisa eksperimen yang gagal.
-    Monster yang lahir dari kegagalan manusia kini berkeliaran, haus akan kehidupan.\"\n\n\"Dengan
-    sisa keberanian yang dimilikinya, sang dokter harus menemukan vaksin sebelum
-    semuanya terlambat. Tidak hanya untuk dirinya sendiri\u2026 tetapi untuk dunia
-    yang masih tersisa.\"\n\nEksperimen telah gagal. Subjek telah lolos. Sekarang,
-    hanya ada satu protokol yang tersisa...\nBertahan. Bersembunyi. Menyelesaikan
-    misi\u2026 atau menjadi bagian dari mereka."
+  m_text: Ketika menjawab soal yang menanyakan nama - nama virus, kamu harus menjawab
+    dengan awalan "Virus", dan pastikan kamu membaca panel misi hingga selesai!
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 5302535af1044152a457ed104f1f4b91, type: 2}
   m_sharedMaterial: {fileID: 2164040, guid: 5302535af1044152a457ed104f1f4b91, type: 2}
