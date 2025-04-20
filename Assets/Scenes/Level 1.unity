@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 2.16
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 2100000, guid: d9fbbacadc798ba4799292081420420e, type: 2}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 8426cf3d3939a7d419671f3d5c269c0b, type: 2}
   m_HaloStrength: 0.147
   m_FlareStrength: 1
   m_FlareFadeSpeed: 14.04
@@ -11973,7 +11973,6 @@ MonoBehaviour:
   PlayerMove: {fileID: 2823432620843136490}
   PlayerLook: {fileID: 0}
   typingSpeed: -0.95
-  bossMutant: {fileID: 0}
   pauseMenu: {fileID: 1981239717}
 --- !u!114 &1338045543
 MonoBehaviour:

@@ -5,73 +5,64 @@ using System.Collections;
 
 public class LoadingScene : MonoBehaviour
 {
-    public Slider loadingBar; // Slider untuk menampilkan progress loading
-    public Text loadingText; // Teks untuk menampilkan status loading
-    public float fakeLoadingSpeed = 0.5f; // Kecepatan loading palsu agar lebih smooth
+    [Header("UI References")]
+    public Slider loadingBar;
+    public Text loadingText;
 
-    private float targetProgress = 0f; // Menyimpan target progress untuk loading bar
-    private bool isProgressStarted = false; // Menandakan apakah progress loading sudah dimulai
+    [Header("Loading Settings")]
+    public float fakeLoadingSpeed = 0.5f;
+
+    private float targetProgress = 0f;
+    private bool isProgressStarted = false;
 
     void Start()
     {
-        // Sembunyikan slider di awal agar tidak langsung terlihat
-        loadingBar.gameObject.SetActive(false);
-
-        // Memulai proses loading scene berikutnya secara asinkron
+        loadingBar.gameObject.SetActive(false); // Hide loading bar at start
         StartCoroutine(LoadSceneAsync());
     }
 
     IEnumerator LoadSceneAsync()
     {
-        // Mengambil nama scene berikutnya dari PlayerPrefs
-        // Jika tidak ada yang tersimpan, gunakan "Level 1" sebagai default
-        string nextScene = PlayerPrefs.HasKey("NextScene") ? PlayerPrefs.GetString("NextScene") : "Level 1";
-
-        // Menampilkan teks awal "Loading..." sebelum progress dimulai
+        string nextScene = PlayerPrefs.GetString("NextScene", "Level 1");
         loadingText.text = "Loading...";
 
-        // Memuat scene secara asinkron, tetapi belum langsung masuk ke scene tersebut
         AsyncOperation operation = SceneManager.LoadSceneAsync(nextScene);
-        operation.allowSceneActivation = false; // Mencegah scene langsung berubah sebelum mencapai 100%
+        operation.allowSceneActivation = false;
 
-        // Delay 1 detik agar efek loading lebih terasa nyata
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1f); // Optional delay
 
-        // Looping untuk mengupdate progress hingga scene selesai dimuat
         while (!operation.isDone)
         {
-            // Menentukan target progress berdasarkan progress asli dari operasi asinkron
-            // AsyncOperation biasanya hanya mencapai 90%, sisanya dikendalikan manual
+            // Unity async load progress usually goes from 0 to 0.9 before allowing activation
             targetProgress = operation.progress < 0.9f ? operation.progress : 1f;
 
-            // Jika progress sudah mulai (di atas 10%), maka tampilkan loading bar
+            // Show loading bar once loading starts
             if (!isProgressStarted && operation.progress > 0.1f)
             {
                 isProgressStarted = true;
-                loadingBar.gameObject.SetActive(true); // Munculkan loading bar
+                loadingBar.gameObject.SetActive(true);
             }
 
-            // Memperbarui nilai loading bar agar terlihat lebih smooth dengan Lerp
-            loadingBar.value = Mathf.Lerp(loadingBar.value, targetProgress, fakeLoadingSpeed * Time.deltaTime);
+            // Lerp for smooth progress bar filling
+            loadingBar.value = Mathf.MoveTowards(loadingBar.value, targetProgress, fakeLoadingSpeed * Time.deltaTime);
 
-            // Jika progress sudah mulai, ubah teks menjadi "Rendering: [persentase]%"
+            // Update loading text
             if (isProgressStarted)
             {
-                loadingText.text = "Rendering: " + (loadingBar.value * 100).ToString("F0") + "%";
+                loadingText.text = "Rendering: " + Mathf.RoundToInt(loadingBar.value * 100f) + "%";
             }
 
-            // Jika progress sudah mencapai 100%, beri instruksi untuk melanjutkan
-            if (loadingBar.value >= 0.99f)
+            // When loading complete
+            if (loadingBar.value >= 0.99f && targetProgress >= 1f)
             {
                 loadingText.text = "Tekan tombol apa saja untuk melanjutkan...";
-                loadingBar.gameObject.SetActive(false); // Sembunyikan loading bar
+                loadingBar.gameObject.SetActive(false);
 
-                // Tunggu hingga pemain menekan tombol sebelum melanjutkan ke scene berikutnya
                 yield return new WaitUntil(() => Input.anyKeyDown);
-                operation.allowSceneActivation = true; // Masuk ke scene tujuan
+                operation.allowSceneActivation = true;
             }
 
-            yield return null; // Tunggu frame berikutnya sebelum melanjutkan looping
+            yield return null;
         }
     }
 }

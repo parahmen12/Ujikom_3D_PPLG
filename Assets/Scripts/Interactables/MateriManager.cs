@@ -4,94 +4,109 @@ using TMPro;
 
 public class MateriManager : MonoBehaviour
 {
-    public GameObject[] materiPanels; // Panel-panel materi yang akan ditampilkan secara bergantian
-    public bool[] materiDibaca = new bool[3]; // Status apakah materi sudah dibaca oleh pemain
-    public GameObject selesaiPanel; // Panel yang muncul setelah semua materi dibaca
-    public TextMeshProUGUI messageText; // Teks untuk memberi notifikasi ke pemain
+    public GameObject[] materiPanels;              // Panel-panel materi
+    public bool[] materiDibaca = new bool[3];      // Status baca
+    public GameObject selesaiPanel;                // Panel selesai
+    public TextMeshProUGUI messageText;            // Pesan notifikasi
 
-    private int materiIndex = 0; // Menyimpan indeks materi yang sedang dibaca
+    private int materiIndex = 0;
 
-    // Fungsi ini dipanggil saat game dimulai (dalam hal ini tidak ada tampilan langsung)
     void Start()
     {
-        // Tidak ada aksi yang dilakukan saat Start, karena ini Materi manager untuk mengatur fungsi panel materi
-        
-    }
-
-    // Fungsi ini dipanggil saat pemain mulai membaca materi (misalnya, lewat trigger atau tombol interaksi)
-    public void MulaiBacaMateri()
-    {
-        materiIndex = 0; // Setel indeks materi ke 0 (materi pertama)
-        ShowNextMateri(); // Tampilkan materi pertama
-    }
-
-    // Fungsi untuk menutup panel materi dan menandainya sebagai telah dibaca
-    public void ClosePanel()
-    {
-        // Tutup panel materi yang sedang ditampilkan
-        if (materiIndex < materiPanels.Length)
+        // Pastikan semua panel materi dimatikan di awal
+        foreach (GameObject panel in materiPanels)
         {
-            materiPanels[materiIndex].SetActive(false); // Menyembunyikan panel materi yang sedang aktif
+            if (panel != null)
+                panel.SetActive(false);
         }
 
-        // Mengubah kunci kursor untuk kembali ke mode terkunci
+        if (selesaiPanel != null)
+            selesaiPanel.SetActive(false);
+
+        // Kunci kursor saat awal scene
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
+    public void MulaiBacaMateri()
+    {
+        materiIndex = 0;
+        ShowNextMateri();
+    }
+
+    public void ClosePanel()
+    {
+        // Validasi indeks
+        if (materiIndex < 0 || materiIndex >= materiPanels.Length)
+        {
+            Debug.LogWarning("Index materi di luar batas!");
+            return;
+        }
+
+        // Tutup panel aktif
+        if (materiPanels[materiIndex] != null)
+            materiPanels[materiIndex].SetActive(false);
+
+        // Tandai sudah dibaca
+        materiDibaca[materiIndex] = true;
+
+        Debug.Log("Materi " + (materiIndex + 1) + " sudah dibaca");
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        // Tandai materi sebagai sudah dibaca
-        materiDibaca[materiIndex] = true;
-
-        // Debugging - menampilkan log di konsol
-        Debug.Log("Materi " + (materiIndex + 1) + " sudah dibaca");
-
-        // Cek apakah semua materi sudah dibaca
+        // Cek semua sudah dibaca
         if (SemuaMateriSudahDibaca())
         {
-            TampilkanPanelSelesai(); // Jika semua materi sudah dibaca, tampilkan panel selesai
+            TampilkanPanelSelesai();
         }
         else
         {
-            materiIndex++; // Pindah ke materi berikutnya
-            ShowNextMateri(); // Tampilkan materi berikutnya
+            materiIndex++;
+            ShowNextMateri();
         }
     }
 
-    // Fungsi untuk menampilkan materi berikutnya
     public void ShowNextMateri()
     {
-        // Cek apakah ada materi yang masih tersisa untuk ditampilkan
-        if (materiIndex < materiPanels.Length)
+        // Validasi
+        if (materiIndex < materiPanels.Length && materiPanels[materiIndex] != null)
         {
-            materiPanels[materiIndex].SetActive(true); // Menampilkan panel materi berdasarkan indeks
-            messageText.text = "Baca materi: " + (materiIndex + 1); // Menampilkan pesan notifikasi
-            Cursor.lockState = CursorLockMode.None; // Mengubah status kunci kursor agar bisa bebas bergerak
-            Cursor.visible = true; // Membuat kursor terlihat
+            materiPanels[materiIndex].SetActive(true);
+            messageText.text = "Baca materi: " + (materiIndex + 1);
+
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            Debug.LogWarning("Panel materi tidak ditemukan atau indeks salah.");
         }
     }
 
-    // Fungsi untuk memeriksa apakah semua materi sudah dibaca
     private bool SemuaMateriSudahDibaca()
     {
-        foreach (bool baca in materiDibaca) // Memeriksa status semua materi
+        foreach (bool baca in materiDibaca)
         {
-            if (!baca) return false; // Jika ada materi yang belum dibaca, kembalikan false
+            if (!baca) return false;
         }
-        return true; // Semua materi sudah dibaca
+        return true;
     }
 
-    // Fungsi untuk menampilkan panel selesai setelah semua materi dibaca
     public void TampilkanPanelSelesai()
     {
-        selesaiPanel.SetActive(true); // Menampilkan panel selesai
-        messageText.text = "Semua materi telah dibaca!"; // Menampilkan pesan selesai
-        Cursor.lockState = CursorLockMode.None; // Membuat kursor bebas bergerak
-        Cursor.visible = true; // Membuat kursor terlihat
+        if (selesaiPanel != null)
+            selesaiPanel.SetActive(true);
+
+        messageText.text = "Semua materi telah dibaca!";
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
-    // Fungsi untuk melanjutkan ke level berikutnya (Level 1)
     public void LanjutKeLevel1()
     {
-        PlayerPrefs.SetInt("Level1_Unlock", 1); // Menyimpan status level 1 terbuka
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Home"); // Memuat scene "Home" setelah materi selesai
+        PlayerPrefs.SetInt("Level1Unlocked", 1); // Ganti nama jadi konsisten
+        PlayerPrefs.Save(); // Simpan PlayerPrefs secara eksplisit
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Home");
     }
 }

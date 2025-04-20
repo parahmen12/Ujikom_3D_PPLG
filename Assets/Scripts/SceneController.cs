@@ -5,133 +5,125 @@ using UnityEngine.SceneManagement;
 public class SceneController : MonoBehaviour
 {
     [Header("Canvas References")]
-    public CanvasGroup splashScreenCanvas; // Canvas Splash Screen
-    public CanvasGroup homeMenuCanvas; // Canvas Home Menu
-    public GameObject menuCanvas; // Canvas menu utama
-    public GameObject currentCanvas; // Canvas yang sedang aktif
-    public GameObject optionCanvas; // Canvas menu option
+    public CanvasGroup splashScreenCanvas;   // Splash screen canvas
+    public CanvasGroup homeMenuCanvas;       // Home menu canvas
+    public GameObject menuCanvas;            // Level selection menu
+    public GameObject currentCanvas;         // Currently active canvas
+    public GameObject optionCanvas;          // Option menu canvas
 
-    private GameObject lastActiveCanvas; // Menyimpan canvas terakhir sebelum masuk ke Option
+    private GameObject lastActiveCanvas;     // Stores last active canvas (used when returning from option menu)
 
     [Header("Splash Screen Settings")]
-    public float fadeDuration = 1.5f; // Durasi animasi fade in/out
-    public float displayTime = 2f; // Waktu tampil sebelum masuk menu
+    public float fadeDuration = 1.5f;
+    public float displayTime = 2f;
 
-    private void Start()
+    void Start()
     {
         StartCoroutine(ShowSplashScreen());
     }
 
     IEnumerator ShowSplashScreen()
     {
-        // Set awal: SplashScreen tampak, HomeMenu transparan
+        // Setup splash screen visibility
         splashScreenCanvas.alpha = 1f;
         homeMenuCanvas.alpha = 0f;
         homeMenuCanvas.gameObject.SetActive(false);
 
-        // Biarkan Splash Screen tampil selama beberapa detik
         yield return new WaitForSeconds(displayTime);
 
-        // Fade out Splash Screen
         yield return StartCoroutine(FadeCanvas(splashScreenCanvas, 0f));
 
-        // Aktifkan Home Menu dan fade in
         homeMenuCanvas.gameObject.SetActive(true);
         yield return StartCoroutine(FadeCanvas(homeMenuCanvas, 1f));
 
-        // Nonaktifkan SplashScreen agar tidak mengganggu
         splashScreenCanvas.gameObject.SetActive(false);
     }
 
     IEnumerator FadeCanvas(CanvasGroup canvas, float targetAlpha)
     {
         float startAlpha = canvas.alpha;
-        float elapsedTime = 0f;
+        float timeElapsed = 0f;
 
-        while (elapsedTime < fadeDuration)
+        while (timeElapsed < fadeDuration)
         {
-            elapsedTime += Time.deltaTime;
-            canvas.alpha = Mathf.Lerp(startAlpha, targetAlpha, elapsedTime / fadeDuration);
+            timeElapsed += Time.deltaTime;
+            canvas.alpha = Mathf.Lerp(startAlpha, targetAlpha, timeElapsed / fadeDuration);
             yield return null;
         }
 
         canvas.alpha = targetAlpha;
     }
 
-    // 🔹 Fungsi Navigasi ke Option Menu
-    private GameObject GetActiveCanvas()
-    {
-        if (menuCanvas != null && menuCanvas.activeSelf) return menuCanvas;
-        if (currentCanvas != null && currentCanvas.activeSelf) return currentCanvas;
-        if (homeMenuCanvas != null && homeMenuCanvas.gameObject.activeSelf) return homeMenuCanvas.gameObject;
-        return null;
-    }
+    // Show Option Menu
     public void OptionMenu()
     {
-        if (optionCanvas != null) // Pastikan ada panel opsi
+        if (optionCanvas != null)
         {
-            lastActiveCanvas = GetActiveCanvas(); // Simpan panel yang sedang aktif sebelum masuk ke Option Menu
-            optionCanvas.SetActive(true); // Tampilkan panel opsi
+            lastActiveCanvas = GetActiveCanvas(); // Save last active menu
+            optionCanvas.SetActive(true);
         }
 
-        if (menuCanvas != null) // Pastikan ada menu utama
+        if (menuCanvas != null)
         {
-            menuCanvas.SetActive(false); // Sembunyikan menu utama
+            menuCanvas.SetActive(false);
         }
     }
 
-    // 🔹 Fungsi untuk Masuk ke Level Menu
+    // Enter Level Menu
     public void EnterMenu()
-{
-    if (menuCanvas != null)
     {
-        menuCanvas.SetActive(true); // Tampilkan Level Menu
+        if (menuCanvas != null)
+        {
+            menuCanvas.SetActive(true);
+        }
+
         if (currentCanvas != null)
         {
-            currentCanvas.SetActive(false); // Sembunyikan menu sebelumnya
+            currentCanvas.SetActive(false);
         }
     }
-}
 
-    // 🔹 Fungsi Kembali ke Menu Sebelumnya
-public void BackGame()
-{
-    // Jika sedang di Option Menu, kembali ke menu sebelumnya
-    if (optionCanvas != null && optionCanvas.activeSelf)
+    // Back Button Logic
+    public void BackGame()
     {
-        optionCanvas.SetActive(false); // Tutup Option Menu
-
-        if (lastActiveCanvas != null) 
+        // If in Option Menu
+        if (optionCanvas != null && optionCanvas.activeSelf)
         {
-            lastActiveCanvas.SetActive(true); // Kembali ke menu sebelumnya
-        }
-        else if (homeMenuCanvas != null)
-        {
-            homeMenuCanvas.gameObject.SetActive(true); // Jika tidak ada menu sebelumnya, kembali ke Home
-        }
-        return; // Hentikan fungsi agar tidak lanjut ke bawah
-    }
+            optionCanvas.SetActive(false);
 
-    // Jika sedang di Level Menu (menuCanvas), kembali ke Home Menu
-    if (menuCanvas != null && menuCanvas.activeSelf)
-    {
-        menuCanvas.SetActive(false); // Sembunyikan Level Menu
+            if (lastActiveCanvas != null)
+            {
+                lastActiveCanvas.SetActive(true);
+            }
+            else if (homeMenuCanvas != null)
+            {
+                homeMenuCanvas.gameObject.SetActive(true);
+            }
+            return;
+        }
+
+        // If in Level Menu
+        if (menuCanvas != null && menuCanvas.activeSelf)
+        {
+            menuCanvas.SetActive(false);
+            if (homeMenuCanvas != null)
+            {
+                homeMenuCanvas.gameObject.SetActive(true);
+            }
+            return;
+        }
+
+        // Default fallback
         if (homeMenuCanvas != null)
         {
-            homeMenuCanvas.gameObject.SetActive(true); // Kembali ke Home Menu
+            homeMenuCanvas.gameObject.SetActive(true);
         }
-        return;
     }
 
-    // Jika tidak sedang di Option Menu atau Level Menu, langsung kembali ke Home Menu
-    if (homeMenuCanvas != null)
-    {
-        homeMenuCanvas.gameObject.SetActive(true);
-    }
-}
+    // -----------------------------
+    // Scene Loading Functions
+    // -----------------------------
 
-
-    // 🔹 Fungsi Load Scene dengan Loading Screen
     public void LoadGameScene()
     {
         PlayerPrefs.SetString("NextScene", "Level 1");
@@ -142,8 +134,10 @@ public void BackGame()
     {
         SceneManager.LoadScene("Home");
     }
+
     public void LevelPrologue()
     {
+        Debug.Log("🔁 Loading Materi Scene...");
         SceneManager.LoadScene("Materi");
     }
 
@@ -169,5 +163,14 @@ public void BackGame()
 #else
         Application.Quit();
 #endif
+    }
+
+    // Helper: Get currently active canvas
+    private GameObject GetActiveCanvas()
+    {
+        if (menuCanvas != null && menuCanvas.activeSelf) return menuCanvas;
+        if (currentCanvas != null && currentCanvas.activeSelf) return currentCanvas;
+        if (homeMenuCanvas != null && homeMenuCanvas.gameObject.activeSelf) return homeMenuCanvas.gameObject;
+        return null;
     }
 }
